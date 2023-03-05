@@ -9,6 +9,7 @@ namespace TelephoneBook
 {
     public class ListManager
     {
+        //Contact list function
         public List<User> GetAll(List<User> userList)
         {
           

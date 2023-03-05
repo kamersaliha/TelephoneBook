@@ -8,10 +8,10 @@ namespace TelephoneBook
 {
     public class SearchManager
     {
+        //Contact search function by name
         public List<User> GetByName(string name, List<User> userList) 
         {
-            //List<User> getUserByName = userList.Where(x=>x.Name.Contains(name)).ToList();
-            
+            //List<User> getUserByName = userList.Where(x=>x.Name.Contains(name)).ToList(); <--- Note :I can use this code instead of "List<User> getUserByName = new List<User>();"           
             List<User> getUserByName = new List<User>();
             foreach (var user in userList)
             {
@@ -19,11 +19,11 @@ namespace TelephoneBook
                 {
                     getUserByName.Add(user);
                 }
-
             }
 
             return  getUserByName;
         }
+        //Contact search function by surname
         public List<User> GetBySurname(string surname, List<User> userList)
         {
             List<User> getUserBySurname = new List<User>();
@@ -38,7 +38,7 @@ namespace TelephoneBook
 
             return getUserBySurname;
         }
-
+        //Contact search function by phone number
         public List<User> GetByPhoneNumber(string phoneNumber, List<User> userList)
         {
             List<User> getUserByPhoneNumber = new List<User>();

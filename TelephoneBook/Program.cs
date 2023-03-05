@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -9,13 +10,12 @@ namespace TelephoneBook
     {
         static void Main(string[] args)
         {
-            // Eklediklerimin listesini burada oluşturdum.
+            // Created a list for the inputs (name, surname, phone number) that receive from the user.
             List<User> userList = new List<User>();
 
+            //Main Menu Options
             while (true)
             {
-
-
                 Console.WriteLine("  Telefon Rehberine Hoşgeldiniz!\n" +
                     "Lütfen Yapacağınız İşlemi Seçiniz:\n" +
                     "(1)Yeni Bir Kişi Ekleme\n" +
@@ -23,247 +23,127 @@ namespace TelephoneBook
                     "(3)Kişi Bilgisi Güncelleme\n" +
                     "(4)Kişileri Listeleme\n" +
                     "(5)Kişileri Arama");
-                int userInput = Convert.ToInt32(Console.ReadLine());
+                
+                string userInput = Console.ReadLine();
 
                 UserManager userManager = new UserManager();
-                static bool isNameValid(string input)
-                {
 
-                    foreach (var item in input)
-                    {
-                        int i = Convert.ToInt32(item);
-                        if(i>=48 && i<=57) 
-                        {
-                            return false;
-                        }
-                    }
-                    return Regex.IsMatch(input, @"^[a-zA-Z0-9ğüşöçİĞÜŞÖÇ]+$");
-                }
+                User user = new User();
 
-
+                
                 switch (userInput)
                 {
-                    case 1:
-                        Console.WriteLine("Lütfen rehbere ekleyeceğiniz kişinin adını giriniz: ");
-                        string name = Console.ReadLine();
-                        while (!isNameValid(name))
-                        {
-                            Console.WriteLine("Hata: İsim sadece harflerden oluşmalıdır!");
-                            Console.WriteLine("Lütfen tekrar isim giriniz: ");
-                            name = Console.ReadLine();
-                        }
+                    
+                    case "1":
 
-
-
-                        Console.WriteLine("Soyadını giriniz: ");
-                        string surname = Console.ReadLine();
-                        while (!isNameValid(surname))
-                        {
-                            Console.WriteLine("Hata: Soyisim sadece harflerden oluşmalıdır!");
-                            Console.WriteLine("Lütfen tekrar soyisim giriniz: ");
-                            surname = Console.ReadLine();
-                        }
-                        long phone = 0;
-                        string phoneNumber = "";
-                        User user = new User();
+                        //Adding starts here. Firstly, The function GetValidName() checks whether the name and surname consists of letters or not.
+                        string name = userManager.GetValidName("Lütfen rehbere ekleyeceğiniz kişinin adını giriniz: ");
+                        string surname = userManager.GetValidName("Soyadını giriniz: ");
+                        string phoneNumber;
                         while (true)
                         {
-                            Console.WriteLine("Telefon numarasını giriniz: ");
-                        
-                        
-                            try
+                            Console.WriteLine("Telefon Numarasını Giriniz:");
+                            phoneNumber = Console.ReadLine();
+
+                            //The function IsPhoneNumberValid checks whether the phone number consists of numbers or not.
+                            //If both conditions are met, the adding operation is done.
+                            if (userManager.IsPhoneNumberValid(phoneNumber))
                             {
-                                phone = long.Parse(Console.ReadLine());
-                                phoneNumber = phone.ToString();
                                 user = new User() { Name = name, Surname = surname, PhoneNumber = phoneNumber };
                                 userManager.Add(user, userList);
                                 break;
-                                
-                            }
-                            catch (Exception)
-                            {
-
-                                Console.WriteLine("Hata: Telefon numarası sadece rakamlardan oluşmalıdır! Lütfen tekrar deneyiniz.");
                             }
                         }
                         break;
-                    case 2:
-                        if(userList.Count == 0)
+
+                    case "2":
+
+                        //Call the function CheckListNotEmpty that checks if the list is empty or not.
+                        if (!userManager.CheckListNotEmpty(userList))
                         {
-                            Console.WriteLine("Hata: Liste boş!");
                             break;
                         }
-                       
-                        Console.WriteLine("Lütfen rehberden sileceğiniz kişinin adını giriniz: ");
-                        name = Console.ReadLine();
-                        while (!isNameValid(name))
-                        {
-                            Console.WriteLine("Hata: İsim sadece harflerden oluşmalıdır!");
-                            Console.WriteLine("Lütfen tekrar isim giriniz: ");
-                            name = Console.ReadLine();
-                        }
 
-                        Console.WriteLine("Soyadını giriniz: ");
-                        surname = Console.ReadLine();
-                        while (!isNameValid(surname))
+                        //After checking the name, surname and phone number, call the Delete function.
+                        name = userManager.GetValidName("Lütfen rehberden sileceğiniz kişinin adını giriniz: ");
+                        surname = userManager.GetValidName("Soyadını giriniz: ");
+                        while (true)
                         {
-                            Console.WriteLine("Hata: Soyisim sadece harflerden oluşmalıdır!");
-                            Console.WriteLine("Lütfen tekrar soyisim giriniz: ");
-                            surname = Console.ReadLine();
-                        }
-                        while(true) { 
-                        Console.WriteLine("Telefon numarasını giriniz: ");
-                        
-                            try
+                            Console.WriteLine("Telefon Numarasını Giriniz:");
+                            phoneNumber = Console.ReadLine();
+                            if (userManager.IsPhoneNumberValid(phoneNumber))
                             {
-                                phone = long.Parse(Console.ReadLine());
-                                phoneNumber = phone.ToString();
-                                user = new User() { Name = name, Surname = surname, PhoneNumber = phoneNumber };
                                 userManager.Delete(name, surname, phoneNumber, userList);
                                 break;
                             }
-                            catch (Exception)
-                            {
-                                Console.WriteLine("Hata: Telefon numarası sadece rakamlardan oluşmalıdır! Lütfen tekrar deneyiniz.");
-                            }
                         }
-                
+                        break;
 
-                break;
-                        
-                
+                    case "3":
 
-                    case 3:
-                        if (userList.Count == 0)
+                        //Call the function CheckListNotEmpty that checks if the list is empty or not.
+                        if (!userManager.CheckListNotEmpty(userList))
                         {
-                            Console.WriteLine("Hata: Liste boş!");
                             break;
                         }
-                        Console.WriteLine("Güncellemek istediğiniz kişinin adını giriniz: ");
-                        name = Console.ReadLine();
-                        while (!isNameValid(name))
-                        {
-                            Console.WriteLine("Hata: İsim sadece harflerden oluşmalıdır!");
-                            Console.WriteLine("Lütfen tekrar isim giriniz: ");
-                            name = Console.ReadLine();
-                        }
 
-
-
-                        Console.WriteLine("Soyadını giriniz: ");
-                        surname = Console.ReadLine();
-                        while (!isNameValid(surname))
-                        {
-                            Console.WriteLine("Hata: Soyisim sadece harflerden oluşmalıdır!");
-                            Console.WriteLine("Lütfen tekrar soyisim giriniz: ");
-                            surname = Console.ReadLine();
-                        }
+                        //After checking the name, surname and phone number, call the Update function.
+                        name = userManager.GetValidName("Güncellemek istediğiniz kişinin adını giriniz: ");
+                        surname = userManager.GetValidName("Soyadını giriniz: ");
                         while (true)
                         {
-                            Console.WriteLine("Güncellemek istediğiniz kişinin telefon numarasını giriniz: ");
-
-
-                            try
+                            Console.WriteLine("Telefon Numarasını Giriniz:");
+                            phoneNumber = Console.ReadLine();
+                            if (userManager.IsPhoneNumberValid(phoneNumber))
                             {
-                                phone = long.Parse(Console.ReadLine());
-                                phoneNumber = phone.ToString();
-                                user = new User() { Name = name, Surname = surname, PhoneNumber = phoneNumber };
                                 userManager.Update(name, surname, phoneNumber, userList);
                                 break;
                             }
-                            catch (Exception)
-                            {
-                                Console.WriteLine("Hata: Telefon numarası sadece rakamlardan oluşmalıdır! Lütfen tekrar deneyiniz.");
-                            }
                         }
-                        
-                        break;
+                        break;                       
 
-                    case 4:
-                        if (userList.Count == 0)
+                    case "4":
+
+                        //Call the function CheckListNotEmpty that checks if the list is empty or not.
+                        if (!userManager.CheckListNotEmpty(userList))
                         {
-                            Console.WriteLine("Hata: Liste boş!");
                             break;
                         }
-                        ListManager listManager = new ListManager();
-              
+
+                        //Got the list of users with the GetAll function in the Listmanager class and sorted them all with foreach method.
+                        ListManager listManager = new ListManager();             
                         var sortedList = listManager.GetAll(userList);
                         Console.WriteLine("Rehberde kayıtlı kişiler:");
+
                         foreach (var y in sortedList)
                         {
-                           
+
                             Console.WriteLine(y.Name + " " + y.Surname + " " + y.PhoneNumber);
                         }
-                   
                         break;
 
-                    case 5:
-                        if (userList.Count == 0)
+                    case "5":
+
+                        //Call the function CheckListNotEmpty that checks if the list is empty or not.
+                        if (!userManager.CheckListNotEmpty(userList))
                         {
-                            Console.WriteLine("Hata: Liste boş!");
                             break;
                         }
 
-                        SearchManager searchManager = new SearchManager();
-
-                        bool isNumeric(string choose)
-                        {
-                            bool numeric;
-
-                            foreach (char item in choose)
-                            {       
-
-                                if(!Char.IsDigit(item))
-                                {
-                                    numeric = false;
-                                    return numeric;
-                                }
-                            }
-                            numeric = true;
-
-                            return numeric;
-                        }
-
-                        int intChoose = 0;
-                        while (true)
-                        {
+                        //Asked what property the search would be with.
+                        SearchManager searchManager = new SearchManager();                                                                    
 
                             Console.WriteLine("Ad ile arama yapmak için 1");
                             Console.WriteLine("Soyad ile arama yapmak için 2'yi");
                             Console.WriteLine("Telefon numarası ile arama yapmak için 3'ü tuşlayınız.");
-                            string choose = Console.ReadLine(); 
-                           
-
-                            if (!isNumeric(choose))
-                            {
-                                
-                                Console.WriteLine("Lütfen sayı giriniz!");
-
-                            }
-                            
-                                
-                                
-                                else
-                                {
-                                    intChoose = Convert.ToInt32(choose);
-                                break;
-                                }
-                                
-
-                            
-                        }
-                        switch (intChoose)
+                            string choose = Console.ReadLine();                                                                                                            
+                        
+                        switch (choose)
                         { 
-                            case 1:
-                                Console.WriteLine("Aramak istediğiniz kişinin adını giriniz: ");
-                                name = Console.ReadLine();
-                                while (!isNameValid(name))
-                                {
-                                    Console.WriteLine("Hata: İsim sadece harflerden oluşmalıdır!");
-                                    Console.WriteLine("Lütfen tekrar isim giriniz: ");
-                                    name = Console.ReadLine();
-                                }
+                            case "1":
 
+                                // Checking the name with GetValidName function, found the person with the GetByName function and printed it.
+                                name = userManager.GetValidName("Aramak istediğiniz kişinin adını giriniz: ");                                
                                 foreach (var kullanici in searchManager.GetByName(name, userList))
                                 {
                                     Console.WriteLine(kullanici.Name + " " + kullanici.Surname + " " + kullanici.PhoneNumber);
@@ -271,16 +151,11 @@ namespace TelephoneBook
 
                                 break;
 
-                            case 2:
-                                Console.WriteLine("Aramak istediğiniz kişinin soyadını giriniz: ");
-                                surname = Console.ReadLine();
-                                while (!isNameValid(surname))
-                                {
-                                    Console.WriteLine("Hata: İsim sadece harflerden oluşmalıdır!");
-                                    Console.WriteLine("Lütfen tekrar isim giriniz: ");
-                                    surname = Console.ReadLine();
-                                }
+                            case "2":
 
+                                // Checking the surname with GetValidName function, found the person with the GetByName function and printed it.
+                                surname = userManager.GetValidName("Aramak istediğiniz kişinin soyadını giriniz: ");
+                          
                                 foreach (var kullanici in searchManager.GetBySurname(surname, userList))
                                 {
                                     Console.WriteLine(kullanici.Name + " " + kullanici.Surname + " " + kullanici.PhoneNumber);
@@ -288,36 +163,28 @@ namespace TelephoneBook
 
                                 break;
 
-                            case 3:
-                                while (true)
-                                {
+                            case "3":
 
-                                
+                                // Checking the phone number with IsPhoneNumberValid function, found the person with the GetByPhoneNumber function and printed it.
+                                while (true)
+                                {                                
                                 Console.WriteLine("Aramak istediğiniz kişinin telefon numarasını giriniz: ");
                                 phoneNumber = Console.ReadLine();
-                              
 
-                                    try
+                                    if (userManager.IsPhoneNumberValid(phoneNumber))
                                     {
-                                        phone = long.Parse(Console.ReadLine());
-                                        phoneNumber = phone.ToString();
+                                        Console.WriteLine("Kayıtlı telefon numarası bulunamamıştır!");
                                         break;
                                     }
-                                    
-                                    catch (Exception)
-                                    {
-                                        Console.WriteLine("Hata: Telefon numarası sadece rakamlardan oluşmalıdır! Lütfen tekrar deneyiniz.");
-                                    }
                                 }
-
 
                                 foreach (var kullanici in searchManager.GetByPhoneNumber(phoneNumber, userList))
                                     {
                                         Console.WriteLine(kullanici.Name + " " + kullanici.Surname + " " + kullanici.PhoneNumber);
                                     }
                                 
-
                                 break;  
+
                                 default:
                                 Console.WriteLine("Lütfen 1'den 3'e kadar bir rakam tuşlayınız.");
                                     break;
